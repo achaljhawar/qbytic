@@ -4,6 +4,10 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { Card, CardContent } from '~/components/ui/card';
+import { Button } from '~/components/ui/button';
+import { LoadingSpinner } from '~/components/ui/loading-spinner';
+import { HandCoins } from 'lucide-react';
 
 export default function OnboardingPage() {
   const [username, setUsername] = useState('');
@@ -85,86 +89,90 @@ export default function OnboardingPage() {
 
   if (isCheckingAuth) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
-      </main>
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background">
+        <LoadingSpinner />
+      </div>
     );
   }
 
   if (!isConnected) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background">
         <div className="container flex flex-col items-center justify-center gap-8 px-4 py-16">
-          <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-[3rem]">
-            <span className="text-[hsl(280,100%,70%)]">Qbytic</span> Onboarding
+          <h1 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-[3rem]">
+            <span className="text-primary">Qbytic</span> Onboarding
           </h1>
-          <p className="text-lg text-white/80 mb-8">Connect your wallet to continue with setup</p>
+          <p className="text-lg text-muted-foreground mb-8">Connect your wallet to continue with setup</p>
           <ConnectButton />
         </div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background">
       <div className="container flex flex-col items-center justify-center gap-8 px-4 py-16">
-        <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-[3rem]">
-          Welcome to <span className="text-[hsl(280,100%,70%)]">Qbytic</span>
+        <h1 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-[3rem]">
+          Welcome to <span className="text-primary">Qbytic</span>
         </h1>
         
         {/* Connected Wallet Info */}
-        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4 w-full max-w-md">
-          <div className="flex items-center gap-3">
-            <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-            <div>
-              <p className="text-sm text-white/60">Connected Wallet</p>
-              <p className="font-mono text-sm text-white">
-                {address && typeof address === 'string' ? `${address.slice(0, 6)}...${address.slice(-4)}` : ''}
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="w-full max-w-md">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-white mb-2">
-                Choose your username
-              </label>
-              <input
-                type="text"
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-md text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[hsl(280,100%,70%)] focus:border-transparent"
-                placeholder="Enter your username"
-                required
-                minLength={3}
-                maxLength={20}
-                pattern="^[a-zA-Z0-9_]+$"
-                title="Username can only contain letters, numbers, and underscores"
-              />
-              <p className="mt-1 text-xs text-white/60">
-                3-20 characters, letters, numbers and underscores only
-              </p>
-            </div>
-
-            {error && (
-              <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-md">
-                <p className="text-sm text-red-200">{error}</p>
+        <Card className="w-full max-w-md bg-card border-border">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+              <div>
+                <p className="text-sm text-muted-foreground">Connected Wallet</p>
+                <p className="font-mono text-sm text-card-foreground">
+                  {address && typeof address === 'string' ? `${address.slice(0, 6)}...${address.slice(-4)}` : ''}
+                </p>
               </div>
-            )}
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="w-full max-w-md bg-card border-border">
+          <CardContent className="p-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label htmlFor="username" className="block text-sm font-medium text-card-foreground mb-2">
+                  Choose your username
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full px-3 py-2 bg-input border border-border rounded-md text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                  placeholder="Enter your username"
+                  required
+                  minLength={3}
+                  maxLength={20}
+                  pattern="^[a-zA-Z0-9_]+$"
+                  title="Username can only contain letters, numbers, and underscores"
+                />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  3-20 characters, letters, numbers and underscores only
+                </p>
+              </div>
 
-            <button
-              type="submit"
-              disabled={isLoading || username.length < 3}
-              className="w-full py-2 px-4 bg-[hsl(280,100%,70%)] text-white font-medium rounded-md hover:bg-[hsl(280,100%,65%)] focus:outline-none focus:ring-2 focus:ring-[hsl(280,100%,70%)] focus:ring-offset-2 focus:ring-offset-[#15162c] disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? 'Setting up...' : 'Continue'}
-            </button>
-          </form>
-        </div>
+              {error && (
+                <div className="p-3 bg-destructive/20 border border-destructive/50 rounded-md">
+                  <p className="text-sm text-destructive-foreground">{error}</p>
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                disabled={isLoading || username.length < 3}
+                className="w-full"
+              >
+                {isLoading ? 'Setting up...' : 'Continue'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
-    </main>
+    </div>
   );
 }
