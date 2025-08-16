@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useCallback } from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
@@ -19,50 +20,52 @@ export default function OnboardingPage() {
   const address = accountData.address as string | undefined;
   const router = useRouter();
 
-  useEffect(() => {
-    const checkAuthentication = async () => {
-      if (!isConnected) {
-        setIsCheckingAuth(false);
-        return;
-      }
+  // Memoize authentication check function
+  const checkAuthentication = useCallback(async () => {
+    if (!isConnected) {
+      setIsCheckingAuth(false);
+      return;
+    }
 
-      try {
-        // Add a longer delay to allow cookie to be set after wallet auth
-        await new Promise(resolve => setTimeout(resolve, 600));
+    try {
+      // Add a longer delay to allow cookie to be set after wallet auth
+      await new Promise(resolve => setTimeout(resolve, 600));
+      
+      const response = await fetch('/api/user/profile');
+      if (response.ok) {
+        const userData = await response.json() as { username?: string };
         
-        const response = await fetch('/api/user/profile');
-        if (response.ok) {
-          const userData = await response.json() as { username?: string };
-          
-          // If user already has username, redirect to dashboard
-          if (userData.username) {
-            router.push('/dashboard');
-            return;
-          }
-        } else if (response.status === 401) {
-          // Only redirect to home if we're really not authenticated
-          // and not just experiencing a timing issue
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          // Try one more time before redirecting
-          const retryResponse = await fetch('/api/user/profile');
-          if (retryResponse.status === 401) {
-            router.push('/');
-            return;
-          }
+        // If user already has username, redirect to dashboard
+        if (userData.username) {
+          router.push('/dashboard');
+          return;
         }
-      } catch (error) {
-        console.error('Error checking authentication:', error);
-        // Don't redirect on error, stay on onboarding to let user try again
-      } finally {
-        setIsCheckingAuth(false);
+      } else if (response.status === 401) {
+        // Only redirect to home if we're really not authenticated
+        // and not just experiencing a timing issue
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Try one more time before redirecting
+        const retryResponse = await fetch('/api/user/profile');
+        if (retryResponse.status === 401) {
+          router.push('/');
+          return;
+        }
       }
-    };
-
-    void checkAuthentication();
+    } catch (error) {
+      console.error('Error checking authentication:', error);
+      // Don't redirect on error, stay on onboarding to let user try again
+    } finally {
+      setIsCheckingAuth(false);
+    }
   }, [isConnected, router]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    void checkAuthentication();
+  }, [checkAuthentication]);
+
+  // Memoize form submit handler
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
@@ -85,7 +88,12 @@ export default function OnboardingPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [username, router]);
+
+  // Memoize username change handler
+  const handleUsernameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setUsername(e.target.value);
+  }, []);
 
   if (isCheckingAuth) {
     return (
@@ -142,7 +150,7 @@ export default function OnboardingPage() {
                   type="text"
                   id="username"
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={handleUsernameChange}
                   className="w-full px-3 py-2 bg-input border border-border rounded-md text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                   placeholder="Enter your username"
                   required

@@ -5,11 +5,17 @@ import { type Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { Providers } from "~/components/providers";
+import { PerformanceMonitor } from "~/components/ui/performance-monitor";
 
 export const metadata: Metadata = {
   title: "Qbytic - P2P Crypto Lending",
   description: "Secure peer-to-peer cryptocurrency lending platform",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
+  // Performance optimizations
+  other: {
+    // Preload critical resources
+    'link': 'preload',
+  },
 };
 
 export default function RootLayout({
@@ -27,7 +33,10 @@ html {
         `}</style>
       </head>
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <PerformanceMonitor />
+        </Providers>
       </body>
     </html>
   );

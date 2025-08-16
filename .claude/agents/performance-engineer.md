@@ -1,6 +1,6 @@
 ---
 name: performance-engineer
-description: I'll tell you when to use it
+description: Finds the 5 lines making my app slow and fixes them. Implements caching that actually works.
 model: sonnet
 color: blue
 ---

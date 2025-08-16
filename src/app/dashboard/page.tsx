@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useCallback, useMemo } from 'react';
 import { useAccount, useBalance, useDisconnect } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useEffect, useState } from 'react';
@@ -8,49 +9,158 @@ import { Card, CardContent } from '~/components/ui/card';
 import { LoadingSpinner } from '~/components/ui/loading-spinner';
 import { formatAddress, copyToClipboard } from '~/lib/utils';
 
+// Memoized wallet address card component
+const WalletAddressCard = React.memo(function WalletAddressCard({ 
+  address 
+}: { 
+  address?: string;
+}) {
+  const handleCopy = useCallback(async () => {
+    if (address) {
+      try {
+        await copyToClipboard(address);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    }
+  }, [address]);
+
+  return (
+    <Card className="bg-card border-border">
+      <CardContent className="p-6">
+        <h2 className="text-xl font-semibold mb-4 text-primary">Wallet Address</h2>
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground">Public Address</p>
+          <div className="flex items-center justify-between bg-muted p-3 rounded-lg">
+            <span className="font-mono text-sm text-card-foreground">{formatAddress(address)}</span>
+            <button
+              onClick={handleCopy}
+              className="px-3 py-1 text-xs bg-primary hover:bg-primary/90 text-primary-foreground rounded transition-colors"
+            >
+              Copy
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground">Click to copy full address</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+});
+
+// Memoized balance card component
+const BalanceCard = React.memo(function BalanceCard({ 
+  balance 
+}: { 
+  balance?: { value: bigint; decimals: number; symbol: string };
+}) {
+  const formattedBalance = useMemo(() => {
+    if (!balance) return null;
+    return (Number(balance.value) / 10**balance.decimals).toFixed(4);
+  }, [balance]);
+
+  return (
+    <Card className="bg-card border-border">
+      <CardContent className="p-6">
+        <h2 className="text-xl font-semibold mb-4 text-primary">Wallet Balance</h2>
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground">Current Balance</p>
+          <div className="bg-muted p-3 rounded-lg">
+            {balance ? (
+              <div>
+                <span className="text-2xl font-bold text-card-foreground">
+                  {formattedBalance}
+                </span>
+                <span className="text-lg ml-2 text-muted-foreground">{balance.symbol}</span>
+              </div>
+            ) : (
+              <span className="text-muted-foreground">Loading...</span>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Network: {balance?.symbol === 'ETH' ? 'Localhost' : 'Unknown'}
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+});
+
+// Memoized account details card component
+const AccountDetailsCard = React.memo(function AccountDetailsCard({ 
+  username 
+}: { 
+  username?: string;
+}) {
+  return (
+    <Card className="bg-card border-border">
+      <CardContent className="p-6">
+        <h2 className="text-xl font-semibold mb-4 text-primary">Account Details</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm text-muted-foreground mb-1">Username</p>
+            <p className="font-medium text-card-foreground">{username}</p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground mb-1">Connection Status</p>
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-500/20 text-green-400">
+              <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+              Connected
+            </span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+});
+
 export default function DashboardPage() {
   const accountData = useAccount();
   const address = accountData.address as string | undefined;
   const isConnected = accountData.isConnected;
   const { data: balance } = useBalance({ 
-    address: address as `0x${string}` | undefined 
+    address: address as `0x${string}` | undefined,
+    query: {
+      refetchInterval: 30000, // Refetch every 30 seconds
+      staleTime: 10000, // Consider data stale after 10 seconds
+    }
   });
   const { disconnect } = useDisconnect();
   const router = useRouter();
   const [user, setUser] = useState<{ username?: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        // Add a small delay to allow cookie to be set after wallet auth
-        await new Promise(resolve => setTimeout(resolve, 100));
+  // Memoize the fetch user function
+  const fetchUser = useCallback(async () => {
+    try {
+      // Add a small delay to allow cookie to be set after wallet auth
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const response = await fetch('/api/user/profile');
+      if (response.ok) {
+        const userData = await response.json() as { username?: string };
+        setUser(userData);
         
-        const response = await fetch('/api/user/profile');
-        if (response.ok) {
-          const userData = await response.json() as { username?: string };
-          setUser(userData);
-          
-          // If user doesn't have username, redirect to onboarding
-          if (!userData.username) {
-            router.push('/onboarding');
-            return;
-          }
-        } else if (response.status === 401) {
-          // User not authenticated, redirect to home
-          router.push('/');
+        // If user doesn't have username, redirect to onboarding
+        if (!userData.username) {
+          router.push('/onboarding');
           return;
         }
-      } catch (error) {
-        console.error('Error fetching user:', error);
-        // On error, redirect to home to restart auth flow
+      } else if (response.status === 401) {
+        // User not authenticated, redirect to home
         router.push('/');
         return;
-      } finally {
-        setIsLoading(false);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      // On error, redirect to home to restart auth flow
+      router.push('/');
+      return;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [router]);
 
+  useEffect(() => {
     // Only fetch user data if wallet is connected
     if (isConnected) {
       void fetchUser();
@@ -59,9 +169,9 @@ export default function DashboardPage() {
       setIsLoading(false);
       void router.push('/');
     }
-  }, [isConnected]);
+  }, [isConnected, fetchUser, router]);
 
-  const handleDisconnect = async () => {
+  const handleDisconnect = useCallback(async () => {
     try {
       // Clear NextAuth session
       await fetch('/api/auth/logout', { method: 'POST' });
@@ -77,7 +187,7 @@ export default function DashboardPage() {
       disconnect();
       router.push('/');
     }
-  };
+  }, [disconnect, router]);
 
 
   if (isLoading) {
@@ -123,79 +233,12 @@ export default function DashboardPage() {
 
         {/* Wallet Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {/* Wallet Address Card */}
-          <Card className="bg-card border-border">
-            <CardContent className="p-6">
-              <h2 className="text-xl font-semibold mb-4 text-primary">Wallet Address</h2>
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Public Address</p>
-                <div className="flex items-center justify-between bg-muted p-3 rounded-lg">
-                  <span className="font-mono text-sm text-card-foreground">{formatAddress(address)}</span>
-                  <button
-                    onClick={async () => {
-                      if (address) {
-                        try {
-                          await copyToClipboard(address);
-                        } catch (err) {
-                          console.error('Failed to copy:', err);
-                        }
-                      }
-                    }}
-                    className="px-3 py-1 text-xs bg-primary hover:bg-primary/90 text-primary-foreground rounded transition-colors"
-                  >
-                    Copy
-                  </button>
-                </div>
-                <p className="text-xs text-muted-foreground">Click to copy full address</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Balance Card */}
-          <Card className="bg-card border-border">
-            <CardContent className="p-6">
-              <h2 className="text-xl font-semibold mb-4 text-primary">Wallet Balance</h2>
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Current Balance</p>
-                <div className="bg-muted p-3 rounded-lg">
-                  {balance ? (
-                    <div>
-                      <span className="text-2xl font-bold text-card-foreground">
-                        {(Number(balance.value) / 10**balance.decimals).toFixed(4)}
-                      </span>
-                      <span className="text-lg ml-2 text-muted-foreground">{balance.symbol}</span>
-                    </div>
-                  ) : (
-                    <span className="text-muted-foreground">Loading...</span>
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Network: {balance?.symbol === 'ETH' ? 'Localhost' : 'Unknown'}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <WalletAddressCard address={address} />
+          <BalanceCard balance={balance} />
         </div>
 
         {/* Account Details */}
-        <Card className="bg-card border-border">
-          <CardContent className="p-6">
-            <h2 className="text-xl font-semibold mb-4 text-primary">Account Details</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Username</p>
-                <p className="font-medium text-card-foreground">{user?.username}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Connection Status</p>
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-500/20 text-green-400">
-                  <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
-                  Connected
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <AccountDetailsCard username={user?.username} />
 
         {/* Connect Button for wallet changes */}
         <div className="mt-8 flex justify-center">
