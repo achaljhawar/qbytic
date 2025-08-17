@@ -9,8 +9,7 @@ import { useUSDTContract } from "~/hooks/useTokenContract";
 import { LOAN_STATUSES } from "~/config/contracts";
 
 interface LoanWithCreditScore extends LoanDetails {
-  borrowerCreditScore?: number;
-  isLoadingCreditScore?: boolean;
+  borrowerCreditScore: number;
 }
 
 export function LenderDashboard() {
@@ -24,7 +23,9 @@ export function LenderDashboard() {
   // Fetch loan details and credit scores
   useEffect(() => {
     const fetchLoansData = async () => {
+      console.log('Active loan requests:', activeLoanRequests);
       if (!activeLoanRequests.length) {
+        console.log('No active loan requests found');
         setIsLoading(false);
         return;
       }
@@ -33,20 +34,11 @@ export function LenderDashboard() {
         const loanDetails = await getLoanDetails(Number(loanId));
         if (!loanDetails) return null;
 
-        // Fetch credit score for borrower
+        // Use static credit score
         const loanWithCreditScore: LoanWithCreditScore = {
           ...loanDetails,
-          isLoadingCreditScore: true
+          borrowerCreditScore: 813
         };
-
-        // Fetch credit score in background
-        fetchCreditScore(loanDetails.borrower).then((creditScore) => {
-          setLoans(prev => prev.map(loan => 
-            loan.loanId === loanDetails.loanId 
-              ? { ...loan, borrowerCreditScore: creditScore, isLoadingCreditScore: false }
-              : loan
-          ));
-        });
 
         return loanWithCreditScore;
       });
@@ -59,25 +51,6 @@ export function LenderDashboard() {
     fetchLoansData();
   }, [activeLoanRequests, getLoanDetails]);
 
-  const fetchCreditScore = async (borrowerAddress: string): Promise<number | undefined> => {
-    try {
-      const response = await fetch(`http://localhost:8001/api/credit-score`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address: borrowerAddress })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.credit_data) {
-          return Math.floor(data.credit_data.basic_credit_score * 1000);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching credit score:', error);
-    }
-    return undefined;
-  };
 
   const handleAcceptLoan = async (loan: LoanWithCreditScore) => {
     try {
@@ -97,16 +70,14 @@ export function LenderDashboard() {
     }
   };
 
-  const getCreditScoreColor = (score?: number) => {
-    if (!score) return "text-gray-500";
+  const getCreditScoreColor = (score: number) => {
     if (score >= 750) return "text-green-600 dark:text-green-400";
     if (score >= 650) return "text-yellow-600 dark:text-yellow-400";
     if (score >= 550) return "text-orange-600 dark:text-orange-400";
     return "text-red-600 dark:text-red-400";
   };
 
-  const getCreditScoreLabel = (score?: number) => {
-    if (!score) return "Unknown";
+  const getCreditScoreLabel = (score: number) => {
     if (score >= 750) return "Excellent";
     if (score >= 650) return "Good";
     if (score >= 550) return "Fair";

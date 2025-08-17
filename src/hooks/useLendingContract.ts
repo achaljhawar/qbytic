@@ -42,7 +42,7 @@ export function useLendingContract() {
     const borrowAmountWei = parseUnits(borrowAmount, 6); // USDT has 6 decimals
     const durationSeconds = duration * 24 * 60 * 60; // Convert days to seconds
     
-    writeContract({
+    await writeContract({
       address: LENDING_CONTRACT_ADDRESS,
       abi: LENDING_CONTRACT_ABI,
       functionName: 'proposeLoan',

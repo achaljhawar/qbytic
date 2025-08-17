@@ -11,42 +11,13 @@ export function BorrowForm() {
   const { address } = useAccount();
   const [borrowAmount, setBorrowAmount] = useState("");
   const [duration, setDuration] = useState(30);
-  const [creditScore, setCreditScore] = useState<number | null>(null);
-  const [isLoadingCreditScore, setIsLoadingCreditScore] = useState(true);
+  const [creditScore] = useState<number>(813);
   const [requiredCollateral, setRequiredCollateral] = useState<string>("");
   const [step, setStep] = useState<"form" | "collateral">("form");
   const [proposedLoanId, setProposedLoanId] = useState<number | null>(null);
 
   const { proposeLoan, activateLoan, ethPrice, isWritePending, isConfirmed } = useLendingContract();
 
-  // Fetch credit score
-  useEffect(() => {
-    const fetchCreditScore = async () => {
-      if (!address) return;
-      
-      try {
-        const response = await fetch(`http://localhost:8001/api/credit-score`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ address })
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success && data.credit_data) {
-            setCreditScore(Math.floor(data.credit_data.basic_credit_score * 1000));
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching credit score:', error);
-        setCreditScore(600); // Default score
-      } finally {
-        setIsLoadingCreditScore(false);
-      }
-    };
-
-    fetchCreditScore();
-  }, [address]);
 
   // Calculate required collateral
   useEffect(() => {
@@ -72,7 +43,7 @@ export function BorrowForm() {
   }, [borrowAmount, creditScore, ethPrice]);
 
   const handleProposeLoan = async () => {
-    if (!borrowAmount || !creditScore) return;
+    if (!borrowAmount) return;
     
     try {
       await proposeLoan(borrowAmount, duration, creditScore);
@@ -94,13 +65,6 @@ export function BorrowForm() {
     }
   };
 
-  if (isLoadingCreditScore) {
-    return (
-      <div className="flex justify-center">
-        <LoadingSpinner />
-      </div>
-    );
-  }
 
   if (step === "collateral") {
     return (
@@ -154,16 +118,14 @@ export function BorrowForm() {
         <CardTitle>Borrow USDT Against ETH</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {creditScore && (
-          <div className="bg-green-50 dark:bg-green-900 p-4 rounded-lg">
-            <div className="flex justify-between items-center">
-              <span className="font-medium">Your Credit Score:</span>
-              <span className="text-2xl font-bold text-green-600 dark:text-green-400">
-                {creditScore}
-              </span>
-            </div>
+        <div className="bg-green-50 dark:bg-green-900 p-4 rounded-lg">
+          <div className="flex justify-between items-center">
+            <span className="font-medium">Your Credit Score:</span>
+            <span className="text-2xl font-bold text-green-600 dark:text-green-400">
+              {creditScore}
+            </span>
           </div>
-        )}
+        </div>
 
         <div className="space-y-4">
           <div>
@@ -230,7 +192,7 @@ export function BorrowForm() {
 
           <Button 
             onClick={handleProposeLoan}
-            disabled={!borrowAmount || !creditScore || isWritePending}
+            disabled={!borrowAmount || isWritePending}
             className="w-full"
           >
             {isWritePending ? "Proposing Loan..." : "Propose Loan"}
