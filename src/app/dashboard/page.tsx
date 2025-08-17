@@ -5,9 +5,11 @@ import { useAccount, useBalance, useDisconnect } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Card, CardContent } from '~/components/ui/card';
 import { LoadingSpinner } from '~/components/ui/loading-spinner';
 import { formatAddress, copyToClipboard } from '~/lib/utils';
+import { RoleNavbar, type UserRole } from '~/components/ui/role-navbar';
 
 // Memoized wallet address card component
 const WalletAddressCard = React.memo(function WalletAddressCard({ 
@@ -128,6 +130,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<{ username?: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentRole, setCurrentRole] = useState<UserRole>('borrower');
 
   // Memoize the fetch user function
   const fetchUser = useCallback(async () => {
@@ -189,6 +192,21 @@ export default function DashboardPage() {
     }
   }, [disconnect, router]);
 
+  // Handle role change
+  const handleRoleChange = useCallback((role: UserRole) => {
+    setCurrentRole(role);
+    // Here you could also persist the role preference to localStorage or API
+    localStorage.setItem('userRole', role);
+  }, []);
+
+  // Load saved role preference on mount
+  useEffect(() => {
+    const savedRole = localStorage.getItem('userRole') as UserRole;
+    if (savedRole && (savedRole === 'borrower' || savedRole === 'lender')) {
+      setCurrentRole(savedRole);
+    }
+  }, []);
+
 
   if (isLoading) {
     return (
@@ -214,14 +232,25 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <RoleNavbar 
+        currentRole={currentRole} 
+        onRoleChange={handleRoleChange}
+        username={user?.username}
+      />
+      
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-foreground">
-              Welcome back, <span className="text-primary">{user?.username}</span>
+              {currentRole === 'borrower' ? 'Borrower' : 'Lender'} Dashboard
             </h1>
-            <p className="text-muted-foreground mt-1">Manage your wallet and view your balance</p>
+            <p className="text-muted-foreground mt-1">
+              {currentRole === 'borrower' 
+                ? 'Find and manage your loans' 
+                : 'Manage your lending portfolio'
+              }
+            </p>
           </div>
           <button
             onClick={handleDisconnect}
@@ -239,6 +268,14 @@ export default function DashboardPage() {
 
         {/* Account Details */}
         <AccountDetailsCard username={user?.username} />
+
+        <div className="mt-8 text-center">
+          <Link href="/credit-score">
+            <button className="px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors">
+              Check Credit Score
+            </button>
+          </Link>
+        </div>
 
         {/* Connect Button for wallet changes */}
         <div className="mt-8 flex justify-center">

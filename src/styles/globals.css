@@ -3,40 +3,59 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Updated color tokens for crypto lending dark theme */
+  /* Dark Theme Core Variables - Next.js Design System */
+  --bg-primary: #000000;           /* Main page background */
+  --bg-secondary: #121212;         /* Card/section backgrounds */
+  --bg-overlay: rgba(255, 255, 255, 0.1); /* Subtle overlays */
+  
+  /* Text - High Contrast for Dark Theme */
+  --text-primary: #FFFFFF;         /* Main headings and content */
+  --text-secondary: rgba(255, 255, 255, 0.85); /* Supporting text */
+  --text-muted: #4D4D4D;           /* Muted text, navigation */
+  
+  /* Borders - Subtle Dark Theme */
+  --border-subtle: rgba(255, 255, 255, 0.25); /* Subtle separators */
+  --border-medium: rgba(255, 255, 255, 0.4);  /* Standard borders */
+  
+  /* MAIN ACCENT COLORS - Brand Colors Only */
+  --brand-primary: #00FFD1;        /* Primary brand cyan-green */
+  --brand-hover: rgba(0, 255, 209, 0.1); /* Hover backgrounds */
+  --brand-active: #6FD2C0;         /* Active states */
+
+  /* Updated color tokens for crypto lending dark theme - shadcn compatibility */
   --background: oklch(0 0 0); /* #000000 - Pure black background */
   --foreground: oklch(1 0 0); /* #ffffff - White text */
-  --card: oklch(0.05 0 0); /* #0d0d0d - Very dark card background */
+  --card: oklch(0.07 0 0); /* #121212 - Dark card background */
   --card-foreground: oklch(0.98 0 0); /* #f8fafc - Card text */
-  --popover: oklch(0.05 0 0); /* #0d0d0d - Very dark popover background */
+  --popover: oklch(0.07 0 0); /* #121212 - Dark popover background */
   --popover-foreground: oklch(1 0 0); /* #ffffff - Popover text */
-  --primary: oklch(0.61 0.15 264); /* #6366f1 - Indigo accent */
-  --primary-foreground: oklch(1 0 0); /* #ffffff - Text on primary */
-  --secondary: oklch(0.1 0 0); /* #1a1a1a - Dark gray */
+  --primary: oklch(0.75 0.15 162); /* #00FFD1 - Brand cyan-green */
+  --primary-foreground: oklch(0 0 0); /* #000000 - Text on primary */
+  --secondary: oklch(0.07 0 0); /* #121212 - Dark gray */
   --secondary-foreground: oklch(0.9 0 0); /* #e5e5e5 - Light text on secondary */
   --muted: oklch(0.15 0 0); /* #262626 - Muted elements */
-  --muted-foreground: oklch(0.7 0 0); /* #b3b3b3 - Text on muted */
-  --accent: oklch(0.61 0.15 264); /* #6366f1 - Accent color */
-  --accent-foreground: oklch(1 0 0); /* #ffffff - Text on accent */
+  --muted-foreground: oklch(0.3 0 0); /* #4D4D4D - Text on muted */
+  --accent: oklch(0.75 0.15 162); /* #00FFD1 - Accent color */
+  --accent-foreground: oklch(0 0 0); /* #000000 - Text on accent */
   --destructive: oklch(0.55 0.22 25); /* #dc2626 - Error red */
   --destructive-foreground: oklch(1 0 0); /* #ffffff - Text on error */
   --border: oklch(0.2 0 0); /* #333333 - Border color */
-  --input: oklch(0.05 0 0); /* #0d0d0d - Input background */
-  --ring: oklch(0.61 0.15 264); /* #6366f1 - Focus ring */
-  --chart-1: oklch(0.61 0.15 264); /* #6366f1 - Chart color 1 */
+  --input: oklch(0.07 0 0); /* #121212 - Input background */
+  --ring: oklch(0.75 0.15 162); /* #00FFD1 - Focus ring */
+  --chart-1: oklch(0.75 0.15 162); /* #00FFD1 - Chart color 1 */
   --chart-2: oklch(0.7 0.15 85); /* #f59e0b - Chart color 2 */
   --chart-3: oklch(0.55 0.22 25); /* #dc2626 - Chart color 3 */
   --chart-4: oklch(0.5 0.15 85); /* #a16207 - Chart color 4 */
   --chart-5: oklch(0.15 0 0); /* #262626 - Chart color 5 */
-  --radius: 0.25rem; /* Minimal corner rounding */
-  --sidebar: oklch(0.05 0 0); /* #0d0d0d - Sidebar background */
+  --radius: 0px; /* Sharp edges for Next.js design system */
+  --sidebar: oklch(0.07 0 0); /* #121212 - Sidebar background */
   --sidebar-foreground: oklch(1 0 0); /* #ffffff - Sidebar text */
-  --sidebar-primary: oklch(0.1 0 0); /* #1a1a1a - Primary sidebar */
+  --sidebar-primary: oklch(0.07 0 0); /* #121212 - Primary sidebar */
   --sidebar-primary-foreground: oklch(1 0 0); /* #ffffff - Text on primary sidebar */
-  --sidebar-accent: oklch(0.61 0.15 264); /* #6366f1 - Sidebar accent */
-  --sidebar-accent-foreground: oklch(1 0 0); /* #ffffff - Text on sidebar accent */
+  --sidebar-accent: oklch(0.75 0.15 162); /* #00FFD1 - Sidebar accent */
+  --sidebar-accent-foreground: oklch(0 0 0); /* #000000 - Text on sidebar accent */
   --sidebar-border: oklch(0.2 0 0); /* #333333 - Sidebar border */
-  --sidebar-ring: oklch(0.61 0.15 264); /* #6366f1 - Sidebar focus ring */
+  --sidebar-ring: oklch(0.75 0.15 162); /* #00FFD1 - Sidebar focus ring */
 }
 
 .dark {
@@ -119,8 +138,449 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'JetBrains Mono', 'Geist Sans', system-ui, -apple-system, sans-serif;
+    background: #000000;
+    color: #FFFFFF;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+  html {
+    scroll-behavior: smooth;
+  }
+  code {
+    font-family: 'JetBrains Mono', source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+  }
+}
+
+/* Typography Scale - High Contrast Dark Theme */
+.display-huge { 
+  font-size: 66px; 
+  font-weight: 600; 
+  line-height: 1.1; 
+  letter-spacing: -0.62px; 
+  color: var(--text-primary); 
+}
+
+.display-large { 
+  font-size: 48px; 
+  font-weight: 600; 
+  line-height: 1.1; 
+  letter-spacing: -0.02em; 
+  color: var(--text-primary); 
+}
+
+.display-medium { 
+  font-size: 32px; 
+  font-weight: 600; 
+  line-height: 1.25; 
+  letter-spacing: -0.01em; 
+  color: var(--text-primary); 
+}
+
+/* Headings - Strong Hierarchy */
+.heading-1 { 
+  font-size: 28px; 
+  font-weight: 600; 
+  line-height: 1.2; 
+  letter-spacing: -0.005em; 
+  color: var(--text-primary); 
+}
+
+.heading-2 { 
+  font-size: 24px; 
+  font-weight: 600; 
+  line-height: 1.3; 
+  letter-spacing: -0.02em; 
+  color: var(--text-primary); 
+}
+
+.heading-3 { 
+  font-size: 20px; 
+  font-weight: 600; 
+  line-height: 1.4; 
+  letter-spacing: 0; 
+  color: var(--text-primary); 
+}
+
+/* Body text - Readable on Dark */
+.body-large { 
+  font-size: 20px; 
+  font-weight: 500; 
+  line-height: 1.5; 
+  letter-spacing: 0; 
+  color: var(--text-primary); 
+}
+
+.body-medium { 
+  font-size: 18px; 
+  font-weight: 400; 
+  line-height: 1.5; 
+  letter-spacing: 0; 
+  color: var(--text-secondary); 
+}
+
+.body-small { 
+  font-size: 16px; 
+  font-weight: 400; 
+  line-height: 1.4; 
+  letter-spacing: 0; 
+  color: var(--text-secondary); 
+}
+
+.body-muted { 
+  font-size: 16px; 
+  font-weight: 400; 
+  line-height: 1.4; 
+  letter-spacing: 0; 
+  color: var(--text-muted); 
+}
+
+/* Color Classes */
+.text-brand-primary { color: var(--brand-primary); }
+.text-text-primary { color: var(--text-primary); }
+.text-text-secondary { color: var(--text-secondary); }
+.text-text-muted { color: var(--text-muted); }
+
+/* Button Styles - Sharp edges */
+.btn-primary {
+  background: var(--brand-primary);
+  color: #000000;
+  border: none;
+  border-radius: 0px;
+  padding: 14px 24px;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.4s ease-in-out;
+  min-height: 56px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.btn-primary:hover {
+  background: var(--brand-hover);
+  color: var(--brand-primary);
+}
+
+.btn-primary:active {
+  background: var(--brand-active);
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 0px;
+  padding: 14px 24px;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.4s ease-in-out;
+  min-height: 56px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.btn-secondary:hover {
+  background: #FFFFFF;
+  color: #000000;
+}
+
+.btn-secondary:active {
+  background: #F0F0F0;
+  transform: scale(0.98);
+}
+
+/* Navigation Header - Fixed Dark Header */
+.dark-header {
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 16px 7.6923%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 80px;
+  z-index: 10;
+  box-sizing: border-box;
+}
+
+.dark-nav {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.dark-nav-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 400;
+  transition: color 0.3s ease;
+}
+
+.dark-nav-link:hover {
+  color: var(--text-primary);
+}
+
+.dark-nav-link.active {
+  color: var(--brand-active);
+}
+
+/* Layout System - Dark Theme Grid */
+.dark-container {
+  background: var(--bg-primary);
+  position: relative;
+  min-height: 100vh;
+  padding: 80px 7.6923% 0;
+}
+
+.dark-content-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.dark-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 60px 40px;
+  padding: 60px 0;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Animations */
+.dark-transition {
+  transition: all 0.4s ease-in-out;
+}
+
+.dark-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 255, 209, 0.2);
+}
+
+.dark-button-animate {
+  transition: all 0.4s ease-in-out;
+}
+
+.dark-button-animate:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 20px rgba(0, 255, 209, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 767px) {
+  .dark-header {
+    padding: 16px 20px;
+    height: 70px;
+  }
+  
+  .dark-nav {
+    display: none;
+  }
+  
+  .dark-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 40px 0;
+  }
+  
+  .dark-container {
+    padding: 70px 20px 0;
+  }
+
+  .display-huge {
+    font-size: 40px;
+  }
+
+  .display-large {
+    font-size: 32px;
+  }
+}
+
+@media (min-width: 768px) {
+  .dark-header {
+    padding: 16px 5%;
+  }
+  
+  .dark-grid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 40px 30px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .dark-header {
+    padding: 16px 7.6923%;
+  }
+  
+  .dark-grid {
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 60px 40px;
+  }
+}
+
+/* RainbowKit Custom Styling to match design system - Enhanced Visibility */
+.custom-connect-button [data-rk] {
+  background: var(--brand-primary) !important;
+  color: #000000 !important;
+  border: 2px solid var(--brand-primary) !important;
+  border-radius: 4px !important;
+  padding: 14px 24px !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  min-height: 56px !important;
+  transition: all 0.4s ease-in-out !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  box-shadow: 0 2px 8px rgba(0, 255, 209, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  text-shadow: none !important;
+}
+
+.custom-connect-button [data-rk]:hover {
+  background: rgba(0, 255, 209, 0.9) !important;
+  color: #000000 !important;
+  border-color: #FFFFFF !important;
+  transform: scale(1.02) translateY(-1px) !important;
+  box-shadow: 0 6px 20px rgba(0, 255, 209, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
+}
+
+.custom-connect-button [data-rk]:active {
+  background: var(--brand-active) !important;
+  transform: scale(0.98) !important;
+  box-shadow: 0 1px 4px rgba(0, 255, 209, 0.3) !important;
+}
+
+/* Connected state styling */
+.custom-connect-button [data-rk][aria-expanded="true"] {
+  background: rgba(0, 255, 209, 0.1) !important;
+  color: var(--brand-primary) !important;
+  border-color: var(--brand-primary) !important;
+}
+
+/* RainbowKit Modal Styling - Improved Visibility */
+div[data-rk] div[role="dialog"] {
+  background: #000000 !important;
+  border: 2px solid var(--brand-primary) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(0, 255, 209, 0.2) !important;
+  backdrop-filter: blur(16px) !important;
+}
+
+div[data-rk] div[role="dialog"] * {
+  color: #000000 !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* RainbowKit Modal Content Styling */
+div[data-rk] div[role="dialog"] h1,
+div[data-rk] div[role="dialog"] h2,
+div[data-rk] div[role="dialog"] h3 {
+  color: #000000 !important;
+  font-weight: 600 !important;
+}
+
+div[data-rk] div[role="dialog"] button {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-medium) !important;
+  border-radius: 4px !important;
+  color: #000000 !important;
+  transition: all 0.3s ease !important;
+}
+
+div[data-rk] div[role="dialog"] button:hover {
+  background: var(--brand-hover) !important;
+  border-color: var(--brand-primary) !important;
+  color: var(--brand-primary) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 255, 209, 0.3) !important;
+}
+
+/* RainbowKit Wallet Options */
+div[data-rk] div[role="dialog"] [data-testid] {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 4px !important;
+  transition: all 0.3s ease !important;
+}
+
+div[data-rk] div[role="dialog"] [data-testid]:hover {
+  background: rgba(0, 255, 209, 0.1) !important;
+  border-color: var(--brand-primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* RainbowKit Modal Backdrop */
+div[data-rk] div[data-backdrop] {
+  background: rgba(0, 0, 0, 0.8) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+/* RainbowKit Loading States */
+div[data-rk] [data-pending] {
+  opacity: 0.6 !important;
+  filter: grayscale(0.3) !important;
+}
+
+/* RainbowKit Close Button */
+div[data-rk] button[aria-label*="Close"] {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #FFFFFF !important;
+  border-radius: 50% !important;
+  width: 32px !important;
+  height: 32px !important;
+  transition: all 0.3s ease !important;
+}
+
+div[data-rk] button[aria-label*="Close"]:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: var(--brand-primary) !important;
+  color: var(--brand-primary) !important;
+  transform: scale(1.1) !important;
+}
+
+/* RainbowKit "Get a Wallet" text styling */
+div[data-rk] div[role="dialog"] a[href*="getawallet"],
+div[data-rk] div[role="dialog"] button[data-testid*="get-wallet"],
+div[data-rk] div[role="dialog"] *[data-testid*="get-wallet"],
+div[data-rk] div[role="dialog"] a[href*="rainbowkit.com"],
+div[data-rk] div[role="dialog"] button:has-text("Get a Wallet"),
+div[data-rk] div[role="dialog"] a:has-text("Get a Wallet"),
+div[data-rk] div[role="dialog"] div[data-rk]:contains("Get a Wallet") {
+  color: #FFFFFF !important;
+}
+
+/* RainbowKit Close/Cross Icon - SVG styling */
+div[data-rk] button[aria-label*="Close"] svg,
+div[data-rk] button[aria-label*="Close"] path,
+div[data-rk] button[aria-label*="Close"] line {
+  stroke: #FFFFFF !important;
+  fill: #FFFFFF !important;
+}
+
+div[data-rk] button[aria-label*="Close"]:hover svg,
+div[data-rk] button[aria-label*="Close"]:hover path,
+div[data-rk] button[aria-label*="Close"]:hover line {
+  stroke: var(--brand-primary) !important;
+  fill: var(--brand-primary) !important;
 }
