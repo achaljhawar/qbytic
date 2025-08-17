@@ -17,9 +17,19 @@ export interface LoanDetails {
 }
 
 export function useLendingContract() {
-  const { address } = useAccount();
-  const { writeContract, data: hash, isPending: isWritePending } = useWriteContract();
+  const { address, isConnected, chain } = useAccount();
+  const { writeContract, data: hash, isPending: isWritePending, error: writeError } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
+  
+  console.log('useLendingContract state:', {
+    address,
+    isConnected,
+    chainId: chain?.id,
+    chainName: chain?.name,
+    writeError: writeError?.message,
+    hash,
+    isWritePending
+  });
 
   // Read functions
   const { data: activeLoanRequests, refetch: refetchActiveLoans } = useReadContract({
@@ -42,18 +52,33 @@ export function useLendingContract() {
     const borrowAmountWei = parseUnits(borrowAmount, 6); // USDT has 6 decimals
     const durationSeconds = duration * 24 * 60 * 60; // Convert days to seconds
     
-    await writeContract({
-      address: LENDING_CONTRACT_ADDRESS,
-      abi: LENDING_CONTRACT_ABI,
-      functionName: 'proposeLoan',
-      args: [borrowAmountWei, BigInt(durationSeconds), USDT_CONTRACT_ADDRESS, BigInt(creditScore)]
+    console.log('useLendingContract: proposeLoan called with:', {
+      borrowAmountWei: borrowAmountWei.toString(),
+      durationSeconds,
+      stablecoin: USDT_CONTRACT_ADDRESS,
+      creditScore,
+      address: LENDING_CONTRACT_ADDRESS
     });
+    
+    try {
+      const result = writeContract({
+        address: LENDING_CONTRACT_ADDRESS,
+        abi: LENDING_CONTRACT_ABI,
+        functionName: 'proposeLoan',
+        args: [borrowAmountWei, BigInt(durationSeconds), USDT_CONTRACT_ADDRESS, BigInt(creditScore)]
+      });
+      console.log('writeContract returned:', result);
+      return result;
+    } catch (error) {
+      console.error('writeContract failed:', error);
+      throw error;
+    }
   };
 
   const acceptLoan = async (loanId: number) => {
     if (!address) throw new Error('Wallet not connected');
     
-    writeContract({
+    return writeContract({
       address: LENDING_CONTRACT_ADDRESS,
       abi: LENDING_CONTRACT_ABI,
       functionName: 'acceptLoan',
@@ -64,7 +89,7 @@ export function useLendingContract() {
   const activateLoan = async (loanId: number, collateralAmount: string) => {
     if (!address) throw new Error('Wallet not connected');
     
-    writeContract({
+    return writeContract({
       address: LENDING_CONTRACT_ADDRESS,
       abi: LENDING_CONTRACT_ABI,
       functionName: 'activateLoan',
@@ -76,7 +101,7 @@ export function useLendingContract() {
   const makePayment = async (loanId: number) => {
     if (!address) throw new Error('Wallet not connected');
     
-    writeContract({
+    return writeContract({
       address: LENDING_CONTRACT_ADDRESS,
       abi: LENDING_CONTRACT_ABI,
       functionName: 'makePayment',
@@ -151,6 +176,7 @@ export function useLendingContract() {
     isConfirming,
     isConfirmed,
     hash,
+    writeError,
     
     // Utility
     refetchActiveLoans

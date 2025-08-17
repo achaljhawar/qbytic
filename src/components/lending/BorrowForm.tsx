@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { LoadingSpinner } from "~/components/ui/loading-spinner";
 import { useLendingContract } from "~/hooks/useLendingContract";
+import { LENDING_CONTRACT_ADDRESS } from "~/config/contracts";
 
 export function BorrowForm() {
   const { address } = useAccount();
@@ -16,7 +17,7 @@ export function BorrowForm() {
   const [step, setStep] = useState<"form" | "collateral">("form");
   const [proposedLoanId, setProposedLoanId] = useState<number | null>(null);
 
-  const { proposeLoan, activateLoan, ethPrice, isWritePending, isConfirmed } = useLendingContract();
+  const { proposeLoan, activateLoan, ethPrice, isWritePending, isConfirmed, hash, isConfirming, writeError } = useLendingContract();
 
 
   // Calculate required collateral
@@ -42,16 +43,42 @@ export function BorrowForm() {
     }
   }, [borrowAmount, creditScore, ethPrice]);
 
+  // Monitor transaction status
+  useEffect(() => {
+    console.log('Transaction status changed:', {
+      hash,
+      isWritePending,
+      isConfirming,
+      isConfirmed,
+      writeError: writeError?.message
+    });
+  }, [hash, isWritePending, isConfirming, isConfirmed, writeError]);
+
   const handleProposeLoan = async () => {
     if (!borrowAmount) return;
     
     try {
-      await proposeLoan(borrowAmount, duration, creditScore);
+      console.log('Proposing loan...', { borrowAmount, duration, creditScore });
+      console.log('Wallet address:', address);
+      console.log('Contract address:', LENDING_CONTRACT_ADDRESS);
+      
+      const result = await proposeLoan(borrowAmount, duration, creditScore);
+      console.log('proposeLoan result:', result);
+      console.log('Transaction hash:', hash);
+      console.log('isWritePending:', isWritePending);
+      console.log('isConfirmed:', isConfirmed);
+      
       // In a real app, you'd get the loan ID from the transaction receipt
       setProposedLoanId(1); // Placeholder
       setStep("collateral");
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error proposing loan:', error);
+      // Don't suppress user rejections - let them see what happened
+      if (error?.message?.includes('User rejected') || error?.code === 4001) {
+        alert('Transaction cancelled by user');
+      } else {
+        alert(`Transaction failed: ${error?.message || 'Unknown error'}`);
+      }
     }
   };
 

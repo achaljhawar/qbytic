@@ -15,8 +15,8 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
       retry: (failureCount, error) => {
         // Don't retry on 4xx errors
-        if (error instanceof Error && 'status' in error && 
-            typeof error.status === 'number' && error.status >= 400 && error.status < 500) {
+        if (error instanceof Error && 'status' in (error as any) && 
+            typeof (error as any).status === 'number' && (error as any).status >= 400 && (error as any).status < 500) {
           return false;
         }
         return failureCount < 3;

@@ -19,19 +19,121 @@ export const USDC_CONTRACT_ADDRESS = DEPLOYED_CONTRACTS.ganache.contracts.MockUS
 export const WETH_CONTRACT_ADDRESS = DEPLOYED_CONTRACTS.ganache.contracts.MockWETH;
 
 export const LENDING_CONTRACT_ABI = [
-  "function proposeLoan(uint256 borrowAmount, uint256 duration, address stablecoin, uint256 creditScore) external returns (uint256 loanId)",
-  "function acceptLoan(uint256 loanId) external",
-  "function activateLoan(uint256 loanId) external payable",
-  "function makePayment(uint256 loanId) external",
-  "function getActiveLoanRequests() external view returns (uint256[] memory)",
-  "function getLoanDetails(uint256 loanId) external view returns (address borrower, address lender, uint256 collateralAmount, uint256 outstandingDebt, uint256 currentLTV, uint256 healthFactor, uint8 status, bool collateralDeposited, uint256 proposalExpiration)",
-  "function calculateRequiredCollateral(uint256 borrowAmount, uint256 creditScore) external pure returns (uint256)",
-  "function calculateInterestRate(uint256 creditScore) external pure returns (uint256)",
-  "function getETHPrice() external view returns (uint256)",
-  "function borrowerLoans(address borrower, uint256 index) external view returns (uint256)",
-  "function lenderLoans(address lender, uint256 index) external view returns (uint256)",
-  "function usdt() external view returns (address)",
-  "function usdc() external view returns (address)"
+  {
+    type: "function",
+    name: "proposeLoan",
+    inputs: [
+      { name: "borrowAmount", type: "uint256" },
+      { name: "duration", type: "uint256" },
+      { name: "stablecoin", type: "address" },
+      { name: "creditScore", type: "uint256" }
+    ],
+    outputs: [{ name: "loanId", type: "uint256" }],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
+    name: "acceptLoan",
+    inputs: [{ name: "loanId", type: "uint256" }],
+    outputs: [],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
+    name: "activateLoan",
+    inputs: [{ name: "loanId", type: "uint256" }],
+    outputs: [],
+    stateMutability: "payable"
+  },
+  {
+    type: "function",
+    name: "makePayment",
+    inputs: [{ name: "loanId", type: "uint256" }],
+    outputs: [],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
+    name: "getActiveLoanRequests",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256[]" }],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    name: "getLoanDetails",
+    inputs: [{ name: "loanId", type: "uint256" }],
+    outputs: [
+      { name: "borrower", type: "address" },
+      { name: "lender", type: "address" },
+      { name: "collateralAmount", type: "uint256" },
+      { name: "outstandingDebt", type: "uint256" },
+      { name: "currentLTV", type: "uint256" },
+      { name: "healthFactor", type: "uint256" },
+      { name: "status", type: "uint8" },
+      { name: "collateralDeposited", type: "bool" },
+      { name: "proposalExpiration", type: "uint256" }
+    ],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    name: "calculateRequiredCollateral",
+    inputs: [
+      { name: "borrowAmount", type: "uint256" },
+      { name: "creditScore", type: "uint256" }
+    ],
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "pure"
+  },
+  {
+    type: "function",
+    name: "calculateInterestRate",
+    inputs: [{ name: "creditScore", type: "uint256" }],
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "pure"
+  },
+  {
+    type: "function",
+    name: "getETHPrice",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    name: "borrowerLoans",
+    inputs: [
+      { name: "borrower", type: "address" },
+      { name: "index", type: "uint256" }
+    ],
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    name: "lenderLoans",
+    inputs: [
+      { name: "lender", type: "address" },
+      { name: "index", type: "uint256" }
+    ],
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    name: "usdt",
+    inputs: [],
+    outputs: [{ name: "", type: "address" }],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    name: "usdc",
+    inputs: [],
+    outputs: [{ name: "", type: "address" }],
+    stateMutability: "view"
+  }
 ] as const;
 
 export const ERC20_ABI = [
