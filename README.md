@@ -15,6 +15,15 @@ If you are not familiar with the different technologies used in this project, pl
 - [Tailwind CSS](https://tailwindcss.com)
 - [tRPC](https://trpc.io)
 
+
+  Deployed Contracts:
+  - MockWETH: 0xa1e8FA27678e5aCc042188C6C476004aeD2e3778
+  - MockUSDC: 0x30327553a326845aA002182Ba49b06c4184D7A34
+  - MockUSDT: 0xFE2e36bdfC2f21475D7B4895264A71B50047aA57
+  - ETH Price Feed: 0xf03220776f572fd38E45f0521b43978704701E79
+  - ETH Price Feed Backup: 0x707831567e45d390903A44724ff5Dcd02ea444c4
+  - DecentralizedP2PLending: 0x8093D814FfF1f148000Df45dE53780ECE7A5d173
+
 ## Learn More
 
 To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:

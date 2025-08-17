@@ -20,10 +20,18 @@
     "lint:fix": "next lint --fix",
     "preview": "next build && next start",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "hardhat:compile": "hardhat compile",
+    "hardhat:test": "hardhat test",
+    "hardhat:node": "hardhat node",
+    "hardhat:deploy:localhost": "hardhat ignition deploy ./ignition/modules/LendingProtocol.ts --network localhost",
+    "hardhat:deploy:ganache": "hardhat run scripts/deploy.cjs --network ganache",
+    "hardhat:deploy:sepolia": "hardhat ignition deploy ./ignition/modules/LendingProtocol.ts --network sepolia"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.7.2",
+    "@chainlink/contracts": "^1.4.0",
+    "@openzeppelin/contracts": "^5.4.0",
     "@radix-ui/react-slot": "^1.2.3",
     "@rainbow-me/rainbowkit": "^2.2.8",
     "@t3-oss/env-nextjs": "^0.12.0",
@@ -47,6 +55,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@next/bundle-analyzer": "^15.4.6",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@tailwindcss/postcss": "^4.0.15",
     "@types/node": "^20.14.10",
     "@types/react": "^19.0.0",
@@ -55,6 +64,7 @@
     "eslint": "^9.23.0",
     "eslint-config-next": "^15.2.3",
     "eslint-plugin-drizzle": "^0.2.3",
+    "hardhat": "^2.22.0",
     "postcss": "^8.5.3",
     "prettier": "^3.5.3",
     "prettier-plugin-organize-imports": "^4.2.0",
