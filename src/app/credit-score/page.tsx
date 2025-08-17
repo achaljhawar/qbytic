@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -23,13 +22,22 @@ export default function CreditScorePage() {
       setError(null);
 
       try {
-        const response = await fetch(`http://localhost:8001/api/credit-score/${address}`);
+        const response = await fetch(`http://localhost:8001/api/credit-score`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            address: address
+          })
+        });
+
         if (!response.ok) {
           throw new Error("Failed to fetch credit score.");
         }
         const data = await response.json();
         if (data.success && data.credit_data) {
-          setCreditScore(data.credit_data.basic_credit_score);
+          setCreditScore(data.credit_data.basic_credit_score*1000/1);
         } else {
           throw new Error("Invalid API response.");
         }
