@@ -11,10 +11,10 @@ interface HeaderProps {
 const Navigation = React.memo(function Navigation() {
   return (
     <nav className="dark-nav hidden md:flex">
-      <a href="#features" className="dark-nav-link">Features</a>
-      <a href="#how-it-works" className="dark-nav-link">How it Works</a>
-      <a href="#benefits" className="dark-nav-link">Benefits</a>
-      <a href="#about" className="dark-nav-link">About</a>
+      <a href="/" className="dark-nav-link">Home</a>
+      <a href="/lending" className="dark-nav-link">Lending</a>
+      <a href="/credit-score" className="dark-nav-link">Credit Score</a>
+      <a href="/dashboard" className="dark-nav-link">Dashboard</a>
     </nav>
   );
 });
